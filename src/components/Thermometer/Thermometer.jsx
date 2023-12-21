@@ -7,6 +7,7 @@ function Thermometer() {
   const { temp, setTemp } = useContext(ClimateContext);
   const [newTemp, setNewTemp] = useState(temp)
 
+  // this is the old way, before refactored, see hygrometer for new
   useEffect(() => {
     console.log('temp:', temp);
     console.log('newTemp:', newTemp);

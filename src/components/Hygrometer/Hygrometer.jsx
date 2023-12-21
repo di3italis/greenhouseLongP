@@ -4,8 +4,10 @@ import { ClimateContext } from "../../context/ClimateContext";
 import "./Hygrometer.css";
 
 function Hygrometer() {
-  const { hum, setHum } = useContext(ClimateContext); // set humidity
+  let { hum, setHum } = useContext(ClimateContext); // set humidity
   const [newHum, setNewHum] = useState(hum) // set new humidity
+
+    // this is the new way, after refactored, see thermometer for old
 
   useEffect(() => {
     console.log('humidity:', hum);
@@ -13,18 +15,22 @@ function Hygrometer() {
 
     if (hum === newHum) return; // exit if same
 
-    if (Math.abs(newHum - hum) <= 1) hum = newHum;
+    const adjustHumidity = () => {
+      if (Math.abs(newHum - hum) <= 1) { 
+        setHum(newHum); // accounts for odd count missing below
+      } else {
+        setHum(prevHum => prevHum + (hum < newHum ? 2 : -2));
+      }
+    };
 
-    const humTimer = setTimeout(() => {
-      setHum(prevHum => prevHum + (hum < newHum ? 2 : -2));
-    }, 1000);
+    const humTimer = setTimeout(adjustHumidity, 1000);
 
-    return () => {
-      clearTimeout(humTimer); // recursive cleanup func
-    }
-  }, [hum, newHum, setHum]); // include setHum as dependency
+      return () => {
+        clearTimeout(humTimer); // recursive cleanup func
+      };
+    }, [hum, newHum]); // include setHum as dependency
 
-  console.log(hum);
+    console.log(hum);
 
   return (
     <section>
